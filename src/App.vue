@@ -34,8 +34,22 @@ const uploadFile = async () => {
 
 <template>
     <main>
-        <Map />
-        <input type="file" @change="handleFileChange" accept=".mp4" />
-        <button @click="uploadFile">上傳檔案</button>
+        <Map :telemetryData="telemetryData" />
+        <div class="panel">
+            <input type="file" @change="handleFileChange" accept=".mp4" />
+            <button @click="uploadFile">上傳檔案</button>
+        </div>
     </main>
 </template>
+<style>
+.panel {
+    width: 500px;
+    height: 400px;
+    background: white;
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    border-radius: 20px;
+    padding: 10px;
+}
+</style>

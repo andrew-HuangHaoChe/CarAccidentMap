@@ -4,6 +4,7 @@ const multer = require('multer');
 const fs = require('fs').promises; // 使用 Promise 風格的 fs 模組
 const gpmfExtract = require('gpmf-extract');
 const goproTelemetry = require('gopro-telemetry');
+const { type } = require('os');
 
 const app = express();
 const port = 3000;
@@ -36,9 +37,46 @@ app.post('/upload', upload.single('file'), async (req, res) => {
 
         // 步驟 2: 使用 gopro-telemetry 解析 GPMF 資料
         const telemetryData = await goproTelemetry(extracted, { repeatSticky: true });
-
+        // 步驟 3: 找出 GPS 數據
+        const gpsStream = telemetryData[1]?.streams?.GPS5;
+        if(!gpsStream || !gpsStream.samples) {
+            throw new Error("沒有gps資料在影片當中，請重新上傳!")
+        }
+        // 步驟 4: 將 GPS 數據轉換為 GeoJSON 格式
+        const routeLineGeoJSON = {
+            type: "FeatureCollection",
+            features: [
+                {
+                    type: "Feature",
+                    geometry: {
+                        type: "LineString",
+                        coordinates: gpsStream.samples.map(sample => [
+                            sample.value[1], // longitude
+                            sample.value[0]  // latitude
+                        ])
+                    },
+                    properties: {
+                        device: telemetryData[1]['device name']
+                    }
+                }
+            ]
+        };
+        
+        const routePointsGeoJSON = {
+            type: "FeatureCollection",
+            features: gpsStream.samples.map(sample => ({
+                type: "Feature",
+                geometry: {
+                    type: "Point",
+                    coordinates: [sample.value[1], sample.value[0]]
+                },
+                properties: {
+                    timestamp: sample.date
+                }
+            }))
+        };
         // 傳回解析後的 JSON 資料
-        res.json(telemetryData);
+        res.json({routeLineGeoJSON ,routePointsGeoJSON});
     } catch (err) {
         console.error("Error processing telemetry data:", err);
         res.status(500).send({ error: "Failed to extract telemetry data", details: err.message });
