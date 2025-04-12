@@ -4,3 +4,12 @@
 body {
   font-family: 'Noto Sans TC', sans-serif;
 }
+
+:root {
+  --primary: #47757C;
+  --secondary: #304A6C;
+  --tertiary: #1B3247;
+  --accent1: #9C2A27;
+  --accent2: #B2612D;
+  --neutral: #D8CEB5;
+}
