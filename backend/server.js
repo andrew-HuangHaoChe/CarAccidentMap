@@ -4,10 +4,9 @@ const multer = require('multer');
 const fs = require('fs').promises; // 使用 Promise 風格的 fs 模組
 const gpmfExtract = require('gpmf-extract');
 const goproTelemetry = require('gopro-telemetry');
-const { type } = require('os');
 
 const app = express();
-const port = 3000;
+const _port = 3000;
 
 app.use(cors());
 
@@ -36,7 +35,7 @@ app.post('/upload', upload.single('file'), async (req, res) => {
         const extracted = await gpmfExtract(rawGpmf);
 
         // 解析 GPMF 資料
-        const telemetryData = await goproTelemetry(extracted, { repeatSticky: true });
+        const telemetryData = await goproTelemetry(extracted);
 
         // 嘗試找到 GPS5 數據
         let gpsStream;
@@ -128,6 +127,6 @@ app.post('/upload', upload.single('file'), async (req, res) => {
     }
 });
 
-app.listen(port, () => {
-    console.log(`Server listening at http://localhost:${port}`);
+app.listen(_port, () => {
+    console.log(`Server listening at http://localhost:${_port}`);
 });

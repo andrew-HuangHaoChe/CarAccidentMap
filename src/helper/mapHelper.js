@@ -222,7 +222,6 @@ export function updateMarkerByVideoTime(videoCurrentTime) {
     // 根據影片時間找到最近的 GPS 點
     let closestPoint = null;
     let minTimeDiff = Infinity;
-    console.log('影片目前時間:', videoCurrentTime);
     const videoStartTime = _routePointsGeoJSON.features[0].properties.timestamp; // 取第一個 GPS 時間點作為影片起點
     _routePointsGeoJSON.features.forEach((feature) => {
         const pointTime = feature.properties.timestamp;
@@ -237,7 +236,6 @@ export function updateMarkerByVideoTime(videoCurrentTime) {
             closestPoint = feature.geometry.coordinates;
         }
     });
-    console.log(minTimeDiff, closestPoint);
 
     // 更新標記位置
     if (closestPoint) {

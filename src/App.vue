@@ -8,9 +8,9 @@ const telemetryData = ref(null);
 const uploadInput = ref(null);
 const fileName = ref('');
 const videoUrl = ref(null); // 👉 存影片 URL
+const isLoading = ref(false);
 
 const handleFileChange = (event) => {
-    console.log(event);
     if (event.target.files[0]) {
         file.value = event.target.files[0];
         fileName.value = event.target.files[0].name;
@@ -28,6 +28,7 @@ const uploadFile = async () => {
     formData.append('file', file.value);
 
     try {
+        isLoading.value = true; //loading open
         const response = await axios.post('http://localhost:3000/upload', formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
@@ -36,6 +37,8 @@ const uploadFile = async () => {
         telemetryData.value = response.data;
     } catch (error) {
         console.error(error);
+    } finally {
+        isLoading.value = false; //loading close
     }
 };
 
@@ -52,9 +55,25 @@ const uploadFile = async () => {
             </div>
             <button @click="uploadFile" class="button">上傳檔案</button>
         </div>
+        <div class="loading" v-show="isLoading">
+            <img src="/public/loading.gif" alt="">
+        </div>
     </main>
 </template>
 <style lang="scss">
+.loading {
+    width: 100vw;
+    height: 100vh;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+    background-color: rgba(0, 0, 0, 0.35);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 .d-flex {
     display: flex;
 }
